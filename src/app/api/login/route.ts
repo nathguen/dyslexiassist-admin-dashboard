@@ -1,4 +1,5 @@
 import { User } from "@prisma/client";
+import { cookies } from "next/headers";
 import { z } from "zod";
 
 const LoginSchema = z.object({
@@ -49,10 +50,10 @@ export async function POST(request: Request) {
     });
   }
 
+  const cookieStore = cookies();
+  cookieStore.set("sessionID", token);
+
   return new Response("", {
     status: 200,
-    headers: {
-      "Set-Cookie": `sessionID=${token}; Max-Age=604800;`,
-    },
   });
 }

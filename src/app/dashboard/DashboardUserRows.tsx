@@ -1,14 +1,12 @@
+import { User } from "@prisma/client";
 import { Table } from "@radix-ui/themes";
 import moment from "moment";
 import { IsApprovedCell } from "./IsApprovedCell";
-import { getUsers } from "./users";
 
-export async function DashboardUserRows() {
-  const data = await getUsers();
-
+export async function DashboardUserRows({ users }: { users: User[] }) {
   return (
     <Table.Body>
-      {data.users.map((user) => (
+      {users.map((user) => (
         <Table.Row key={user.id}>
           <Table.Cell>{user.firstName}</Table.Cell>
           <Table.Cell>{user.lastName}</Table.Cell>
