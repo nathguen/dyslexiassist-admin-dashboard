@@ -16,11 +16,14 @@ export async function PUT(request: Request) {
   }
 
   // check that the sessionID cookie is valid
-  const userInfoResp = await fetch("http://localhost:4000/auth/me", {
-    headers: {
-      Authorization: `Bearer ${sessionID}`,
-    },
-  });
+  const userInfoResp = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/auth/me`,
+    {
+      headers: {
+        Authorization: `Bearer ${sessionID}`,
+      },
+    }
+  );
 
   if (!userInfoResp.ok) {
     return new Response("Invalid sessionID cookie", {

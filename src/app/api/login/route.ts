@@ -14,13 +14,16 @@ export async function POST(request: Request) {
     password: passwordValue,
   });
 
-  const userResp = await fetch("http://localhost:4000/auth/login", {
-    method: "POST",
-    body: JSON.stringify({ email, password }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const userResp = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+    {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
   if (!userResp.ok) {
     return new Response("Invalid username or password", {
