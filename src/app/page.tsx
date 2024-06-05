@@ -1,43 +1,50 @@
+"use client";
+
 import { Button, TextField } from "@radix-ui/themes";
-import { redirect } from "next/navigation";
+import axios from "axios";
+import { RedirectType, redirect } from "next/navigation";
+import { useState } from "react";
 
 export default function Home() {
-  async function login(formData: FormData) {
-    "use server";
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
-    let dataError = false;
+  const handleLogin = async (formData: FormData) => {
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    let errorMessage = "";
 
     try {
-      const data = {
-        email: formData.get("email"),
-        password: formData.get("password"),
-      };
-
-      const resp = await fetch("http:localhost:4000/auth/login", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-        },
+      setLoading(true);
+      await axios.post("/api/login", {
+        email,
+        password,
       });
-
-      const json = await resp.json();
     } catch (error) {
-      dataError = true;
-      console.error(error);
+      if (axios.isAxiosError(error) && error.response) {
+        errorMessage = error.response.data;
+      } else {
+        errorMessage = "An error occurred. Please try again.";
+      }
+    } finally {
+      setLoading(false);
     }
 
-    if (!dataError) {
-      redirect("/dashboard");
+    if (errorMessage === "") {
+      redirect("/dashboard", RedirectType.replace);
+    } else {
+      setErrorMessage(errorMessage);
     }
-
-    // mutate data
-    // revalidate cache
-  }
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <form className="flex flex-col gap-2 w-full max-w-xl" action={login}>
+      <h1 className="text-3xl mb-4">Operation Read Admin Login</h1>
+      <form
+        className="flex flex-col gap-2 w-full max-w-xl"
+        action={handleLogin}
+      >
         <TextField.Root
           radius="full"
           placeholder="Username"
@@ -45,6 +52,7 @@ export default function Home() {
           name="email"
           required
         />
+
         <TextField.Root
           radius="full"
           placeholder="Password"
@@ -54,8 +62,16 @@ export default function Home() {
           required
         />
 
+        <div className="text-red-500">{errorMessage}</div>
+
         <div className="w-full flex flex-row justify-end">
-          <Button className="w-1/2" radius="full" type="submit">
+          <Button
+            size="2"
+            radius="full"
+            type="submit"
+            disabled={loading}
+            loading={loading}
+          >
             Submit
           </Button>
         </div>
